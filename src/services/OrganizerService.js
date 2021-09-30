@@ -23,5 +23,10 @@ export default {
         'Content-Type': 'multipart/form-data'
       }
     })
+  },
+
+  getOrganizer(id) {
+    return apiClient.get('/organizers/' + id)
   }
+
 }

@@ -2,9 +2,10 @@
   <div>
     <h1>Create an organizer</h1>
     <form @submit.prevent="saveOrganizer">
-      <h3>Name & describe your organizer</h3>
+      <h3>Organizer name</h3>
 
-      
+      <BaseInput v-model="organizer.name" type="text" label="name" />
+      <h3>Name & describe your organizer</h3>      
       <UploadImages :max="1" @changed="handleImages" />
       <button type="submit">Submit</button>
     </form>
@@ -24,7 +25,8 @@ export default {
 
   data() {
     return {
-      event: {
+      organizer: {
+        name: '',
         imageUrls: []
       },
       files: []
@@ -32,32 +34,35 @@ export default {
   },
   methods: {
     saveOrganizer() {
-        Promise.all(
-          this.files.map((file) => {
-            return OrganizerService.uploadFile(file)
+      console.log(this.files)
+      Promise.all(
+        this.files.map((file) => {
+          return OrganizerService.uploadFile(file)
         })
-       
-        ).then((response) => {
-           this.Organizer.imageUrls = response.map((r) => r.data)
+      ).then((response) => {
+        this.organizer.imageUrls = response.map((r) => r.data)
         OrganizerService.saveOrganizer(this.organizer)
           .then((response) => {
             console.log(response)
+            this.$router.push({
+              name: 'organizerDetail',
+              params: { id: response.data.id }
+            })
             this.GStore.flashMessage =
-              'You are successfully add a new organizer'
+              'You are successfully add a new organizer name : '+ response.data.name
             setTimeout(() => {
               this.GStore.flashMessage = ''
             }, 3000)
-
           })
           .catch(() => {
             this.$router.push('NetworkError')
           })
       })
-    },
-    handleImages(files) {
-      this.files = files
+        },
+        handleImages(files) {
+          this.files = files
+    }
   }
-}
 }
 </script>
 <style>

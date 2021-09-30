@@ -13,6 +13,7 @@ import EventService from '@/services/EventService.js'
 import GStore from '@/store'
 import OrganizerService from '@/services/OrganizerService.js'
 import OrganizerForm from '@/views/OrganizerForm.vue'
+import OrganizerDetail from '@/views/organizer/Details.vue' 
 
 
 const routes = [
@@ -107,6 +108,30 @@ const routes = [
     path: '/network-error',
     name: 'NetworkError',
     component: NetWorkError
+  },
+  {
+    path: '/organizers/:id',
+    name: 'organizerDetail',
+    props: true,
+    component: OrganizerDetail,
+    beforeEnter: (to) => {
+      return OrganizerService.getOrganizer(to.params.id) // Return and params.id
+        .then((response) => {
+          // Still need to set the data here
+          GStore.organizer = response.data // <--- Store the event
+        })
+        .catch((error) => {
+          if (error.response && error.response.status == 404) {
+            return {
+              // <--- Return
+              name: '404Resource',
+              params: { resource: 'organizer' }
+            }
+          } else {
+            return { name: 'NetworkError' } // <--- Return
+          }
+        })
+    }
   }
 ]
 
